@@ -3,29 +3,15 @@ package kubernetes
 import (
 	"context"
 	"log"
-	"os"
-
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CreateDeployment(ctx context.Context, deploymentName string, imageName string, replicas int32, namespace string) error {
-	kubeConfigPath := os.Getenv("KUBECONFIG")
-	config, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
-	if err != nil {
-		return err
-	}
-
-	clientSet, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return err
-	}
-	// create a new deployment
-	deploymentsClient := clientSet.AppsV1().Deployments(namespace)
+func (d *KubernetesClient) CreateDeployment(ctx context.Context, deploymentName string, imageName string, replicas int32, namespace string) error {
+	// Create a new deployment
+	deploymentsClient := d.Client.AppsV1().Deployments(namespace)
 
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -64,7 +50,7 @@ func CreateDeployment(ctx context.Context, deploymentName string, imageName stri
 	}
 
 	// Use the context directly with the client-go operation
-	_, err = deploymentsClient.Create(ctx, deployment, metav1.CreateOptions{})
+	_, err := deploymentsClient.Create(ctx, deployment, metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}
