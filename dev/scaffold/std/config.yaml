@@ -1,0 +1,4 @@
+kubernetes_deployment_name: "std"
+kubernetes_default_replicas: 3
+kubernetes_namespace: "std"
+docker_image_uri: "nginx:1.14.2"

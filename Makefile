@@ -14,4 +14,4 @@ start-worker:
 	KUBECONFIG=.kind-kubeconfig.yaml go run ./workflows/std/worker/main.go
 
 start-workflow:
-	KUBECONFIG=.kind-kubeconfig.yaml go run ./workflows/std/starter/main.go
+	KUBECONFIG=.kind-kubeconfig.yaml SCAFFOLD_CONFIG_PATH=dev/scaffold/std/config.yaml go run ./workflows/std/starter/main.go

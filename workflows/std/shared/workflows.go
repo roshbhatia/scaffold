@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/roshbhatia/scaffold/workflows/std/config"
 	"go.temporal.io/sdk/workflow"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -64,15 +65,24 @@ func DeployKubernetes(ctx context.Context, deploymentName string, imageName stri
 	return nil
 }
 
-func KubernetesDeploymentWorkflow(ctx workflow.Context, deploymentName string, imageName string, replicas int) error {
+func KubernetesDeploymentWorkflow(ctx workflow.Context, configFilePath string) error {
 	ctx = workflow.WithActivityOptions(ctx, workflow.ActivityOptions{
 		StartToCloseTimeout:    time.Minute * 10, // Timeout for the activity
 		HeartbeatTimeout:       time.Second * 2,  // Heartbeat interval
 		ScheduleToCloseTimeout: time.Minute * 10, // Total timeout that includes retries
 	})
 
-	err := workflow.ExecuteActivity(ctx, DeployKubernetes, deploymentName, imageName, replicas).Get(ctx, nil)
+	// Read the config file
+	cfg, err := config.ReadConfig(configFilePath)
 	if err != nil {
+		workflow.GetLogger(ctx).Error("Failed to read configuration", "Error", err)
+		return err
+	}
+
+	// Deploy to Kubernetes using the config
+	err = workflow.ExecuteActivity(ctx, DeployKubernetes, cfg.KubernetesDeploymentName, cfg.DockerImageURI, cfg.KubernetesDefaultReplicas).Get(ctx, nil)
+	if err != nil {
+		workflow.GetLogger(ctx).Error("Failed to deploy Kubernetes", "Error", err)
 		return err
 	}
 
