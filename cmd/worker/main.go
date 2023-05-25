@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 
@@ -12,9 +13,14 @@ import (
 	"github.com/roshbhatia/scaffold/pkg/workflows"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/klog/v2"
 )
 
 func main() {
+	// Initialize klog flags
+	klog.InitFlags(nil)
+	flag.Parse()
+
 	// Create the client object just once per process
 	c, err := client.NewClient(client.Options{})
 	if err != nil {
@@ -24,7 +30,7 @@ func main() {
 
 	// This worker hosts both Worker and Activity functions
 	w := worker.New(c, config.TaskQueueName, worker.Options{})
-	
+
 	// Create Kubernetes client
 	kubeconfig := os.Getenv("KUBECONFIG")
 	kubeConfigObj, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
@@ -45,8 +51,8 @@ func main() {
 
 	// Create workflow manager
 	workflowManager := &workflows.WorkflowManager{
-		ConfigReader: configReader,
-		KubernetesClient:   kubeClient,
+		ConfigReader:     configReader,
+		KubernetesClient: kubeClient,
 	}
 
 	w.RegisterActivity(workflowManager.KubernetesClient.CreateDeployment)

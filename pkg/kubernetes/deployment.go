@@ -2,11 +2,11 @@ package kubernetes
 
 import (
 	"context"
-	"log"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/klog/v2"
 )
 
 func (d *KubernetesClient) CreateDeployment(ctx context.Context, deploymentName string, imageName string, replicas int32, namespace string) error {
@@ -55,6 +55,6 @@ func (d *KubernetesClient) CreateDeployment(ctx context.Context, deploymentName 
 		return err
 	}
 
-	log.Printf("Deployment %s created", deploymentName)
+	klog.Infof("Deployment %s created", deploymentName)
 	return nil
 }

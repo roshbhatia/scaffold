@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"os"
 
@@ -9,9 +10,14 @@ import (
 	"github.com/roshbhatia/scaffold/pkg/kubernetes"
 	"github.com/roshbhatia/scaffold/pkg/workflows"
 	"go.temporal.io/sdk/client"
+	"k8s.io/klog/v2"
 )
 
 func main() {
+	// Initialize klog flags
+	klog.InitFlags(nil)
+	flag.Parse()
+
 	// Create the client object just once per process
 	c, err := client.NewClient(client.Options{})
 	if err != nil {
@@ -37,8 +43,8 @@ func main() {
 
 	// Create the workflow manager with dependencies
 	workflowManager := &workflows.WorkflowManager{
-		ConfigReader: configReader,
-		KubernetesClient:   kubeClient,
+		ConfigReader:     configReader,
+		KubernetesClient: kubeClient,
 	}
 
 	// Start a workflow execution
@@ -47,5 +53,5 @@ func main() {
 		log.Fatalln("Failed to execute workflow", err)
 	}
 
-	log.Println("Started workflow", "WorkflowID", we.GetID(), "RunID", we.GetRunID())
+	klog.Info("Started workflow", "WorkflowID", we.GetID(), "RunID", we.GetRunID())
 }
