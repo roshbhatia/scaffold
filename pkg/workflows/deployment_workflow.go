@@ -16,8 +16,10 @@ func KubernetesDeploymentWorkflow(ctx workflow.Context, configFilePath string) e
 		ScheduleToCloseTimeout: time.Minute * 10, // Total timeout that includes retries
 	})
 
+	configReader := config.DefaultConfigReader{}
+
 	// Read the config file
-	cfg, err := config.ReadConfig(configFilePath)
+	cfg, err := configReader.ReadConfig(configFilePath)
 	if err != nil {
 		workflow.GetLogger(ctx).Error("Failed to read configuration", "Error", err)
 		return err
