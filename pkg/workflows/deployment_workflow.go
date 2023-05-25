@@ -1,10 +1,10 @@
-package workflow
+package workflows
 
 import (
 	"time"
 
-	"github.com/roshbhatia/scaffold/src/shared/config"
-	kubernetesShim "github.com/roshbhatia/scaffold/src/shared/kubernetes"
+	"github.com/roshbhatia/scaffold/pkg/config"
+	kubernetesShim "github.com/roshbhatia/scaffold/pkg/kubernetes"
 	"go.temporal.io/sdk/workflow"
 )
 

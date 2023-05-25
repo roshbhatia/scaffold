@@ -6,9 +6,9 @@ import (
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 
-	workflowDefinitions "github.com/roshbhatia/scaffold/src/cmd/std/workflow"
-	"github.com/roshbhatia/scaffold/src/shared/config"
-	kubernetesShim "github.com/roshbhatia/scaffold/src/shared/kubernetes"
+	"github.com/roshbhatia/scaffold/pkg/config"
+	kubernetesShim "github.com/roshbhatia/scaffold/pkg/kubernetes"
+	workflowDefinitions "github.com/roshbhatia/scaffold/pkg/workflows"
 )
 
 func main() {
