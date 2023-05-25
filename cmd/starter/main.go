@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	workflowDefinitions "github.com/roshbhatia/scaffold/src/cmd/std/workflow"
-	"github.com/roshbhatia/scaffold/src/shared/config"
+	"github.com/roshbhatia/scaffold/pkg/config"
+	workflowDefinitions "github.com/roshbhatia/scaffold/pkg/workflows"
 	"go.temporal.io/sdk/client"
 )
 
