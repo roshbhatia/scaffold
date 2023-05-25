@@ -5,10 +5,9 @@ import (
 	"log"
 	"os"
 
+	workflowDefinitions "github.com/roshbhatia/scaffold/src/cmd/std/workflow"
+	"github.com/roshbhatia/scaffold/src/shared/config"
 	"go.temporal.io/sdk/client"
-
-	"github.com/roshbhatia/scaffold/workflows/std/config"
-	"github.com/roshbhatia/scaffold/workflows/std/shared"
 )
 
 func main() {
@@ -32,7 +31,7 @@ func main() {
 		log.Fatalln("Failed to get SCAFFOLD_CONFIG_PATH from environment variables")
 	}
 	
-	we, err := c.ExecuteWorkflow(context.Background(), options, shared.KubernetesDeploymentWorkflow, configPath)
+	we, err := c.ExecuteWorkflow(context.Background(), options, workflowDefinitions.KubernetesDeploymentWorkflow, configPath)
 	if err != nil {
 		log.Fatalln("Failed to execute workflow", err)
 	}

@@ -1,4 +1,4 @@
-.PHONY: create-kind-cluster delete-kind-cluster reset-kind-cluster start-worker start-workflow
+.PHONY: create-kind-cluster delete-kind-cluster reset-kind-cluster run-starter run-worker
 
 create-kind-cluster:
 	kind create cluster --config dev/kind/cluster-config.yaml
@@ -10,8 +10,8 @@ delete-kind-cluster:
 
 reset-kind-cluster: delete-kind-cluster create-kind-cluster
 
-start-worker:
-	KUBECONFIG=.kind-kubeconfig.yaml go run ./workflows/std/worker/main.go
+run-starter:
+	SCAFFOLD_CONFIG_PATH=dev/scaffold/std/config.yaml KUBECONFIG=.kind-kubeconfig.yaml go run ./src/cmd/std/starter/main.go
 
-start-workflow:
-	KUBECONFIG=.kind-kubeconfig.yaml SCAFFOLD_CONFIG_PATH=dev/scaffold/std/config.yaml go run ./workflows/std/starter/main.go
+run-worker:
+	SCAFFOLD_CONFIG_PATH=dev/scaffold/std/config.yaml KUBECONFIG=.kind-kubeconfig.yaml go run ./src/cmd/std/worker/main.go
