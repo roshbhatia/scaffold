@@ -13,7 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CreateDeployment(ctx context.Context, deploymentName string, imageName string, replicas int32) error {
+func CreateDeployment(ctx context.Context, deploymentName string, imageName string, replicas int32, namespace string) error {
 	kubeConfigPath := os.Getenv("KUBECONFIG")
 	config, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
 	if err != nil {
@@ -25,7 +25,7 @@ func CreateDeployment(ctx context.Context, deploymentName string, imageName stri
 		return err
 	}
 	// create a new deployment
-	deploymentsClient := clientSet.AppsV1().Deployments(corev1.NamespaceDefault)
+	deploymentsClient := clientSet.AppsV1().Deployments(namespace)
 
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{

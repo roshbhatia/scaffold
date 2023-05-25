@@ -24,7 +24,7 @@ func KubernetesDeploymentWorkflow(ctx workflow.Context, configFilePath string) e
 	}
 
 	// Deploy to Kubernetes using the config
-	err = workflow.ExecuteActivity(ctx, kubernetesShim.CreateDeployment, cfg.KubernetesDeploymentName, cfg.DockerImageURI, cfg.KubernetesDefaultReplicas).Get(ctx, nil)
+	err = workflow.ExecuteActivity(ctx, kubernetesShim.CreateDeployment, cfg.KubernetesDeploymentName, cfg.DockerImageURI, cfg.KubernetesDefaultReplicas, cfg.KubernetesNamespace).Get(ctx, nil)
 	if err != nil {
 		workflow.GetLogger(ctx).Error("Failed to deploy Kubernetes", "Error", err)
 		return err
