@@ -23,3 +23,6 @@ go.work
 bin/*
 
 scratch
+
+# Generated kubeconfig
+.kind-kubeconfig.yaml
