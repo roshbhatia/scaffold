@@ -6,11 +6,10 @@ import (
 
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
-	"go.temporal.io/sdk/workflow"
 
 	"github.com/roshbhatia/scaffold/pkg/config"
 	kubernetesShim "github.com/roshbhatia/scaffold/pkg/kubernetes"
-	workflowDefinitions "github.com/roshbhatia/scaffold/pkg/workflows"
+	"github.com/roshbhatia/scaffold/pkg/workflows"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -25,7 +24,7 @@ func main() {
 
 	// This worker hosts both Worker and Activity functions
 	w := worker.New(c, config.TaskQueueName, worker.Options{})
-
+	
 	// Create Kubernetes client
 	kubeconfig := os.Getenv("KUBECONFIG")
 	kubeConfigObj, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
@@ -37,16 +36,22 @@ func main() {
 		log.Fatalln("Failed to create client", err)
 	}
 
+	// Create config reader
 	// Create dependencies
-	configReader := config.DefaultConfigReader{}
+	configReader := config.ConfigReader{}
 	kubeClient := kubernetesShim.KubernetesClient{
 		Client: clientSet,
 	}
 
+	// Create workflow manager
+	workflowManager := &workflows.WorkflowManager{
+		ConfigReader: configReader,
+		KubernetesClient:   kubeClient,
+	}
+
+	w.RegisterActivity(workflowManager.KubernetesClient.CreateDeployment)
 	// Register workflow with dependencies
-	w.RegisterWorkflow(func(ctx workflow.Context, configFilePath string) error {
-		return workflowDefinitions.KubernetesDeploymentWorkflow(ctx, &configReader, kubeClient, configFilePath)
-	})
+	w.RegisterWorkflow(workflowManager.KubernetesDeploymentWorkflow)
 
 	err = w.Run(worker.InterruptCh())
 	if err != nil {

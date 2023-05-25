@@ -6,13 +6,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type ConfigReader interface {
+type ConfigReaderInterface interface {
 	ReadConfig(path string) (*Config, error)
 }
 
-type DefaultConfigReader struct{}
+type ConfigReader struct{}
 
-func (d DefaultConfigReader) ReadConfig(path string) (*Config, error) {
+func (d *ConfigReader) ReadConfig(path string) (*Config, error) {
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
 		return &Config{}, err

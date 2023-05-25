@@ -6,7 +6,8 @@ import (
 	"os"
 
 	"github.com/roshbhatia/scaffold/pkg/config"
-	workflowDefinitions "github.com/roshbhatia/scaffold/pkg/workflows"
+	"github.com/roshbhatia/scaffold/pkg/kubernetes"
+	"github.com/roshbhatia/scaffold/pkg/workflows"
 	"go.temporal.io/sdk/client"
 )
 
@@ -24,14 +25,24 @@ func main() {
 		TaskQueue: config.TaskQueueName,
 	}
 
-	// Start a workflow execution.
-	// The configuration file path is read from the environment variable
+	// Read the configuration file path from the environment variable
 	configPath := os.Getenv("SCAFFOLD_CONFIG_PATH")
 	if configPath == "" {
 		log.Fatalln("Failed to get SCAFFOLD_CONFIG_PATH from environment variables")
 	}
-	
-	we, err := c.ExecuteWorkflow(context.Background(), options, workflowDefinitions.KubernetesDeploymentWorkflow, configPath)
+
+	// Create dependencies
+	configReader := config.ConfigReader{}
+	kubeClient := kubernetes.KubernetesClient{}
+
+	// Create the workflow manager with dependencies
+	workflowManager := &workflows.WorkflowManager{
+		ConfigReader: configReader,
+		KubernetesClient:   kubeClient,
+	}
+
+	// Start a workflow execution
+	we, err := c.ExecuteWorkflow(context.Background(), options, workflowManager.KubernetesDeploymentWorkflow, configPath)
 	if err != nil {
 		log.Fatalln("Failed to execute workflow", err)
 	}

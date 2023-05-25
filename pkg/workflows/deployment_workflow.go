@@ -3,20 +3,17 @@ package workflows
 import (
 	"time"
 
-	"github.com/roshbhatia/scaffold/pkg/config"
-	kubernetesShim "github.com/roshbhatia/scaffold/pkg/kubernetes"
 	"go.temporal.io/sdk/workflow"
 )
 
 
-func KubernetesDeploymentWorkflow(ctx workflow.Context, configReader config.ConfigReader, kubeClient kubernetesShim.KubernetesClient, configFilePath string) error {
-	cfg, err := configReader.ReadConfig(configFilePath)
+func (w *WorkflowManager) KubernetesDeploymentWorkflow(ctx workflow.Context, configFilePath string) error {
+	cfg, err := w.ConfigReader.ReadConfig(configFilePath)
 	// Read the config file
 	if err != nil {
 		workflow.GetLogger(ctx).Error("Failed to read configuration", "Error", err)
 		return err
 	}
-	
 
 	ctx = workflow.WithActivityOptions(ctx, workflow.ActivityOptions{
 		StartToCloseTimeout:    time.Minute * 10, // Timeout for the activity
@@ -25,7 +22,7 @@ func KubernetesDeploymentWorkflow(ctx workflow.Context, configReader config.Conf
 	})
 
 	// Deploy to Kubernetes using the config
-	err = workflow.ExecuteActivity(ctx, kubeClient.CreateDeployment, cfg.KubernetesDeploymentName, cfg.DockerImageURI, cfg.KubernetesDefaultReplicas).Get(ctx, nil)
+	err = workflow.ExecuteActivity(ctx, w.KubernetesClient.CreateDeployment, cfg.KubernetesDeploymentName, cfg.DockerImageURI, cfg.KubernetesDefaultReplicas, cfg.KubernetesNamespace).Get(ctx, nil)
 	if err != nil {
 		workflow.GetLogger(ctx).Error("Failed to deploy Kubernetes", "Error", err)
 		return err
